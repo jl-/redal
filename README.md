@@ -1,12 +1,12 @@
 #### Usage:
 
 ```js
-import Redalfrom 'redal';
+import Redal from 'redal';
 
 
 class Demo extends Component {
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.state = { redalHidden: true };
   }
   toggle() {
@@ -56,7 +56,7 @@ class Demo extends Component {
 ```
 
 ```
-{/* can be put hoever deep inside Redal */}
+{/* can be put however deep inside Redal */}
 <Redal.X
   beforeLeave, // function, its return value determines whether the modal can be closed or not. `true`, a `Promise` to be resolved, `undefined`; `false`
   component // tag, default 'span'
