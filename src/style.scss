@@ -1,0 +1,17 @@
+@import 'styles/configs';
+@import 'styles/mixins';
+@import 'styles/modules/flex';
+.redal {
+  @extend .fcol;
+  @extend .f-jc-c;
+  @extend .f-ja-c;
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.2);
+  overflow: auto;
+  &-inner {
+  }
+}
