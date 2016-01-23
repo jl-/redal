@@ -10,7 +10,7 @@ const PATHS = {
   PUBLIC: '/'
 };
 const WEBPACK_HOST = process.env.HOST || 'localhost'
-const WEBPACK_PORT = process.env.PORT || 3003;
+const WEBPACK_PORT = process.env.PORT || 3005;
 
 let AUTOPREFIXER_CONF = [
   '{browsers:["last 5 version"]}'
@@ -39,15 +39,15 @@ let externals = {
 
 let build = {
   entry: {
-    src: './src/deck.js'
+    src: './src/index.js'
   },
   resolve: resolve,
   output: {
     path: PATHS.DIST,
-    filename: 'deck.js',
+    filename: 'index.js',
     publicPath: PATHS.PUBLIC,
-    sourceMapFilename: 'deck.map.json',
-    library: 'ReactDeck',
+    sourceMapFilename: 'index.map.json',
+    library: 'ReactRedal',
     libraryTarget: 'umd'
   },
   module: {

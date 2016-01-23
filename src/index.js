@@ -1,10 +1,10 @@
 /**
- * <Redal enterDuration leaveDuration ref='redal' willEnter={} didEnter={} willLeave={} didLeave={} hidden={true}>
+ * <Redal scoped={false} enterDuration leaveDuration ref='redal' willEnter={} didEnter={} willLeave={} didLeave={} maskToggle={false} handleMaskClick hidden={true}>
  *   <Redal.X> x </Redal.X>
  *   <div className='redal-header'></div>
  *   <div className='redal-body'></div>
  *   <div className='redal-footer'>
- *     <Redal.X beforeClose={}> confirm </Redal.X>
+ *     <Redal.X beforeLeave={}> confirm </Redal.X>
  *     <Redal.X> cancel </Redal.X>
  *   </div>
  * </Redal>
@@ -13,15 +13,15 @@
  *
  *
  **/
-import React, { Component, Children } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
+import ReactDOM from 'react-dom';
 import ReactTransitionGroup from 'react-addons-transition-group';
 import RedalWrapper from './wrapper';
 import RedalX from './x';
-
 import './style.scss';
+const renderSubtreeIntoContainer = ReactDOM.unstable_renderSubtreeIntoContainer;
 
-const ENTER_DURATION = 0;
-const LEAVE_DURATION = 0;
+const DEFAULT_DURATION = 0;
 
 const STATUS_SHOWN = 1;
 const STATUS_HIDDEN = 2;
@@ -40,26 +40,54 @@ function replaceRedalX(children, replace) {
 }
 
 class Redal extends Component {
+  static defaultProps = {
+    hidden: true
+  };
+
   constructor(props, context) {
+    const { hidden = true } = props;
     super(props, context);
-    this.state = { status: props.hidden ? STATUS_HIDDEN : STATUS_SHOWN };
+    this.state = { hidden };
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.hidden !== this.props.hidden) {
-      this.setState({ status: nextProps.hidden ? STATUS_HIDDEN : STATUS_SHOWN });
+    if (nextProps.scoped !== true) {
+      const hidden = nextProps.hidden !== this.props.hidden ? nextProps.hidden : this.state.hidden;
+      this.toggle(hidden, nextProps);
     }
   }
+  componentDidMount() {
+    const { scoped, ...props } = this.props;
+    if (scoped === true) return;
+    this.node = document.createElement('div');
+    this.node.className = 'ReactModalPortal';
+    document.body.appendChild(this.node);
+    this.toggle(props.hidden, props);
+  }
+  componentWillUnmount() {
+    if (!this.node) return;
+    ReactDOM.unmountComponentAtNode(this.node);
+    document.body.removeChild(this.node);
+  }
+
   close() {
-    this.setState({ status: STATUS_HIDDEN });
+    this.toggle(true);
   }
   open() {
-    this.setState({ status: STATUS_SHOWN });
+    this.toggle(false);
+  }
+  toggle(hidden = !this.state.hidden, { scoped, ...props } = this.props) {
+    this.setState({ hidden });
+    if (scoped !== true) {
+      props.hidden = hidden;
+      this.renderPortal(props);
+    }
   }
   delegateRedalX(redalX) {
     return React.cloneElement(redalX, Object.assign({}, redalX.props, { onClick: this.createLeaveHandler(redalX.props.beforeLeave) }));
   }
   createLeaveHandler(beforeLeave) {
     const handler = typeof beforeLeave === 'function' ? e => {
+      e.stopPropagation();
       const shouldLeave = beforeLeave();
       if (shouldLeave === false) return;
       if (!shouldLeave || typeof shouldLeave.then !== 'function') return this.close();
@@ -68,20 +96,28 @@ class Redal extends Component {
     return handler;
   }
 
-  render() {
-    const { enterDuration = ENTER_DURATION, leaveDuration = LEAVE_DURATION, children, ...props } = this.props;
-    const { status } = this.state;
-    const content = status === STATUS_SHOWN ? (
-      <RedalWrapper key={WRAPPER_KEY} {...props} enterDuration={enterDuration} leaveDuration={leaveDuration}>
+  renderPortal(props) {
+    this.portal = renderSubtreeIntoContainer(this, this.build(props), this.node);
+  }
+
+  build(pristineProps) {
+    const { enterDuration = DEFAULT_DURATION, leaveDuration = enterDuration, children, hidden, ...props } = pristineProps;
+    const content = hidden ? null : (
+      <RedalWrapper key={WRAPPER_KEY} {...props} enterDuration={enterDuration} leaveDuration={leaveDuration} close={::this.close}>
         {replaceRedalX(children, ::this.delegateRedalX)}
       </RedalWrapper>
-    ) : null;
+    );
 
     return (
       <ReactTransitionGroup component='div' transitionEnterTimeout={enterDuration} transitionLeaveTimeout={leaveDuration}>
-        {content}
+      {content}
       </ReactTransitionGroup>
     );
+  }
+
+  render() {
+    const { scoped, ...props } = this.props;
+    return scoped !== true ? React.DOM.noscript() : props.hidden = this.state.hidden, this.build(props);
   }
 }
 
