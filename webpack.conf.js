@@ -34,6 +34,13 @@ let externals = {
     commonjs: 'react-dom',
     amd: 'react-dom',
     umd: 'react-dom'
+  },
+  'react-addons-transition-group': {
+    root: 'ReactTransitionGroup',
+    commonjs2: 'react-addons-transition-group',
+    commonjs: 'react-addons-transition-group',
+    amd: 'react-addons-transition-group',
+    umd: 'react-addons-transition-group'
   }
 };
 

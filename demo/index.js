@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import ReactDom from 'react-dom';
-import Redal from '../src';
+import ReactDOM from 'react-dom';
+import Redal from './dist';
+//import Redal from '../src';
 import './index.scss';
 const REDAL_REF = Symbol('redal');
 
@@ -30,7 +31,7 @@ class Demo extends Component {
   }
 }
 
-ReactDom.render(
+ReactDOM.render(
   <Demo></Demo>
   ,document.querySelector('#demo')
 );

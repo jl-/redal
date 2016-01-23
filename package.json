@@ -1,6 +1,6 @@
 {
   "name": "redal",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "react modal",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,7 +18,7 @@
   "bugs": {
     "url": "https://github.com/jl-/redal/issues"
   },
-  "main": "dist/redal.js",
+  "main": "dist/index.js",
   "homepage": "https://github.com/jl-/redal",
   "dependencies": {
     "classnames": "^2.2.0",
