@@ -3,6 +3,7 @@
 `npm i redal --save`
 
 ```js
+import React, { Component } from 'react';
 import Redal from 'redal';
 
 const REDAL_REF = Symbol('redal');
@@ -10,35 +11,36 @@ const REDAL_REF = Symbol('redal');
 class Demo extends Component {
   constructor(props, context) {
     super(props, context);
+    this.state = { maskToggle: false };
   }
   toggle(hidden) {
     this.refs[REDAL_REF].toggle(hidden);
   }
-  canBeClosed() {
-    // return `false` to stop the modal from closing
-    // return a `Promise` to defer the closing when resolved
-    // otherwise close the modal immediately
-  }
-  afterModalClosed(modalDom) {
-  }
   render() {
     return (
-      <div>
-        <Redal ref={REDAL_REF} enterDuration={800} leaveDuration={800} didLeave={::this.afterModalClosed}>
-          {/* click to close the modal*/}
-          <Redal.X> x </Redal.X>
-
-          <div className='redal-header'></div>
-          <div className='redal-body'></div>
-          <div className='redal-footer'>
-
-            {/* click to close the modal if beforeClose() !== false */}
-            <Redal.X beforeLeave={::this.canBeClosed}> confirm </Redal.X>
-
-            <Redal.X> cancel </Redal.X>
-          </div>
-        </Redal>
-      </div>
+        <div className='wrapper'>
+          <button onClick={() => this.toggle(false)}>Open Redal</button>
+          <button onClick={() => this.setState({ maskToggle: !this.state.maskToggle })}>
+            maskToggle: {this.state.maskToggle ? 'true' : 'false'}
+          </button>
+          <Redal
+            ref={REDAL_REF}
+            enterTimeout={800}
+            handleMaskClick={() => confirm('close on mask clicked?')}
+            maskToggle={this.state.maskToggle}
+            didEnter={() => {
+              alert('did enter');
+            }}
+            didLeave={() => {
+              alert('did leave');
+            }}
+          >
+            <div className='inner'>
+              <h1>some content</h1>
+              <Redal.X component='h3' beforeLeave={() => confirm('confirm leave?')}>Close redal</Redal.X>
+            </div>
+          </Redal>
+        </div>
     );
   }
 }
@@ -49,16 +51,29 @@ class Demo extends Component {
 
 ```js
 <Redal
-  scoped // boolean, default to `false`, which will append the modal dom to body (portal pattern);
-         // set as `true` to leave the actually modal dom where <Redal> is used, which is useful when you don't want the modal to be full screen, in which case
-         // you also need to set a `transform` css property rather than `none` on any closest ancestor you want the modal to be scoped to, then the modal will be
+  variant // {string?}
+  scoped // {boolean? := `false`}
+         // default to append the modal dom to body (portal pattern);
+         // set as `true` to leave the actually modal dom where <Redal> is used,
+         // which is useful when you don't want the modal to be full screen, in which case
+         // you also need to set a `transform` css property rather than `none` on
+         // any closest ancestor you want the modal to be scoped to, then the modal will be
          // just the full size of that ancestor
-  enterDuration, leaveDuration, // same as your animation-duration for css animation
+  enterTimeout, leaveTimeout // {number} same as your animation-duration for css animation
   willEnter, didEnter, willLeave, didLeave // callback for modal lifecycles
-  maskToggle // boolean, default to `false`, should close the modal or not when you click on the mask
-  handleMaskClick // optional, (event, innerDOM), if `!handleMaskClick(e,innerDOM)` then will close, vice versa. If this function is set, will ignore `maskToggle`
-  hidden //
-  >
+  maskToggle // {boolean? := `false`} should close the modal or not when you click on the mask
+  handleMaskClick // {function?} (event, innerDOM)
+                  // if `!handleMaskClick(e,innerDOM)` then will close, vice versa.
+                  // If this function is set, will ignore `maskToggle`
+  hidden // { boolean := `false`}
+>
+  <Redal.X> x </Redal.X>
+  <div className='redal-header'></div>
+  <div className='redal-body'></div>
+  <div className='redal-footer'>
+    <Redal.X beforeLeave={}> confirm </Redal.X>
+    <Redal.X> cancel </Redal.X>
+  </div>
 </Redal>
 ```
 
@@ -106,5 +121,4 @@ git clone 'https://github.com/jl-/redal.git'
 npm i;
 bower i; // don't worry, only install normalize.css for demo
 gulp dev
-
 ```

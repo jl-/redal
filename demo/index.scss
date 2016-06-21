@@ -12,9 +12,13 @@ html, body, #demo, .wrapper {
   transform: translate(0,0);
 }
 
+.inner {
+  border: 1px solid yellow;
+}
+
 $redal-dura: 0.8s;
 .redal {
-  background-color: black;
+  background-color: rgba(0,0,0,0.8);
   color: white;
   &--entering {
     animation: fade-in both ease;

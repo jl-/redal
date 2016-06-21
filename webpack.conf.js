@@ -2,6 +2,8 @@ import webpack from 'webpack';
 import path from 'path';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
+const WEBPACK_HOST = process.env.HOST || 'localhost'
+const WEBPACK_PORT = process.env.PORT || 3006;
 const PATHS = {
   SRC: path.resolve(__dirname, 'src'),
   DEMO: path.resolve(__dirname, 'demo'),
@@ -9,18 +11,16 @@ const PATHS = {
   NODE_MODULES: path.resolve(__dirname, 'node_modules'),
   PUBLIC: '/'
 };
-const WEBPACK_HOST = process.env.HOST || 'localhost'
-const WEBPACK_PORT = process.env.PORT || 3005;
 
-let AUTOPREFIXER_CONF = [
+const AUTOPREFIXER_CONF = [
   '{browsers:["last 5 version"]}'
 ].join('&');
 
-
-let resolve = {
+const resolve = {
   extensions: ['', '.js', '.jsx']
 }
-let externals = {
+
+const externals = {
   'react': {
     root: 'React',
     commonjs2: 'react',
@@ -44,33 +44,7 @@ let externals = {
   }
 };
 
-let build = {
-  entry: {
-    src: './src/index.js'
-  },
-  resolve: resolve,
-  output: {
-    path: PATHS.DIST,
-    filename: 'index.js',
-    publicPath: PATHS.PUBLIC,
-    sourceMapFilename: 'index.map.json',
-    library: 'ReactRedal',
-    libraryTarget: 'umd'
-  },
-  module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      loader: 'babel'
-    }, {
-      test: /\.(css|scss)$/,
-      loader: `style!css?importLoaders=2!autoprefixer?${AUTOPREFIXER_CONF}!sass`
-    }]
-  },
-  devtool: 'sourcemap',
-  externals: externals,
-};
-
-let demo = {
+const demo = {
   entry: {
     demo: [
       'webpack-dev-server/client?http://' + WEBPACK_HOST + ':' + WEBPACK_PORT,
@@ -90,7 +64,7 @@ let demo = {
     loaders: [{
       test: /\.jsx?$/,
       loaders: ['react-hot', `babel`],
-      include: [PATHS.SRC, PATHS.DEMO]
+      include: [PATHS.SRC, PATHS.DEMO, PATHS.DIST]
     }, {
       test: /\.(css|scss)$/,
       loader: `style!css?importLoaders=2!autoprefixer?${AUTOPREFIXER_CONF}!sass`
@@ -108,6 +82,32 @@ let demo = {
   ]
 }
 
+const build = {
+  entry: {
+    src: './src/index.js'
+  },
+  resolve: resolve,
+  output: {
+    path: PATHS.DIST,
+    filename: 'index.js',
+    publicPath: PATHS.PUBLIC,
+    sourceMapFilename: 'index.map.json',
+    library: 'ReactRedal',
+    libraryTarget: 'umd'
+  },
+  module: {
+    loaders: [{
+      test: /\.jsx?$/,
+      loader: 'babel',
+      include: [PATHS.SRC, PATHS.DEMO, PATHS.DIST]
+    }, {
+      test: /\.(css|scss)$/,
+      loader: `style!css?importLoaders=2!autoprefixer?${AUTOPREFIXER_CONF}!sass`
+    }]
+  },
+  devtool: 'sourcemap',
+  externals: externals,
+};
 
 const devServerConf = {
   contentBase: PATHS.DIST,
@@ -119,10 +119,8 @@ const devServerConf = {
   }
 };
 
-export default {
+export {
+  WEBPACK_HOST, WEBPACK_PORT,
+  demo, devServerConf,
   build,
-  demo,
-  devServerConf,
-  WEBPACK_HOST,
-  WEBPACK_PORT
 }

@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import cns from 'classnames';
+import cx from 'classnames';
 
 class ReactX extends Component {
   render() {
-    const { children, className, component = 'span', ...props } = this.props;
-    props.className = cns(className, 'redal-x');
+    const { children, variant, className, component = 'span', ...props } = this.props;
+    props.className = cx(className, variant && `${variant}-x`);
     return React.createElement(component, props, children);
   }
 }
