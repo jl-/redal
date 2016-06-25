@@ -11,6 +11,7 @@ import {
   WEBPACK_HOST,
   WEBPACK_PORT
 } from './webpack.conf';
+import ghp from './gh-pages/webpack.conf';
 
 gulp.task('clean', cb => del('dist/*', cb));
 
@@ -39,4 +40,13 @@ gulp.task('wp:dev', (cb) => {
 
 gulp.task('dev', cb => {
   run('statics', 'watch', 'wp:dev');
+});
+
+gulp.task('wp:ghp', (cb) => {
+  webpack(ghp, function(err, stats) {
+    cb();
+  });
+});
+gulp.task('ghp', cb => {
+  run('build', 'wp:ghp');
 });
