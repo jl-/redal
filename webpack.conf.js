@@ -120,7 +120,7 @@ const devServerConf = {
 };
 
 export {
-  WEBPACK_HOST, WEBPACK_PORT,
+  PATHS, WEBPACK_HOST, WEBPACK_PORT,
   demo, devServerConf,
   build,
 }
